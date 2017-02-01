@@ -1,3 +1,5 @@
+# Getting started instructions for OSX
+#
 # 1. Install pdf2htmlEX (https://github.com/coolwanglu/pdf2htmlEX/wiki/Building)
 # From terminal, run brew install pdf2htmlEX
 #
@@ -14,10 +16,12 @@
 # https://coolestguidesontheplanet.com/add-shell-path-osx/
 #
 #
-# Beautifulsoup PDF notes: http://mylifelogontheweb.blogspot.com/2009/05/scraping-pdfs-in-python.html
+# BeautifulSoup PDF notes: http://mylifelogontheweb.blogspot.com/2009/05/scraping-pdfs-in-python.html
 
 import subprocess
 import fileinput
+import os
+
 
 def fileProcess(fileName):
     """
@@ -31,7 +35,6 @@ def fileProcess(fileName):
     pdfConvert(pdfName)
     htmlFixer(htmlName)
 
-################################
 
 def pdfConvert(pdfName):
     """
@@ -39,19 +42,21 @@ def pdfConvert(pdfName):
     :param pdfName:
     :return:
     """
-    subprocess.call("pdf2htmlEX "+pdfName, shell=True)
+    try:
+        subprocess.call("pdf2htmlEX "+pdfName, shell=True)
+    except:
+        print('pdf2htmlEX did not work, is it installed and in your path? Error: %s' % e)
+        raise
 
 
-
-#################################
 
 def htmlFixer(htmlName):
     """
-    pdf2htmlEX creates a few situations where empty spans are nested in divs
-    to separate values, when the values should really be in new divs. This
-    searches for the close tag of the empty span [space]</span> and replaces
-    it with tags to close the span and close the current and start a new
-    div. This also creates a backup of the original file in the same directory.
+    pdf2htmlEX creates a few instances where empty spans are nested in divs
+    to separate values in new columns, when the values should instead be in
+    new divs. This searches for the close tag of the empty span [space]</span>
+    and replaces it with tags to close the span and close the current and start a
+    new div. This also creates a backup of the original file in the same directory.
     :param htmlName:
     :return:
     """
@@ -59,13 +64,51 @@ def htmlFixer(htmlName):
     textToSearch = ' </span>'
     textToReplace = '</span></div><div>'
 
-    with fileinput.FileInput(fileToSearch, inplace=True, backup='.bak') as file:
-        for line in file:
-            print(line.replace(textToSearch, textToReplace), end='')
+    try:
+        with fileinput.FileInput(fileToSearch, inplace=True, backup='.bak') as file:
+            for line in file:
+                print(line.replace(textToSearch, textToReplace), end='')
+    except:
+        print('HTML editing error: %s' % e)
+        raise
 
-#################################
+def buildSheetImportIterator(rootDir):
+    """
+    This function iterates through the subdirectories in rootDir,
+    filters by files with a .pdf extension that aren't hidden,
+    and builds a list of these files called filesImported.
 
-fileProcess('bs2')
+    :param rootDir: Root directory
+    :return: true if files present for import
+    """
+    filesImported = []
+
+    try:
+        for dirs, subdirs, files in os.walk(rootDir):
+            if not dirs.split("/")[-1] == 'imported':  # avoid directories called imported
+                for file in files:
+                    if not file[:1] == '.':  # avoid hidden files that start with a period
+                        if file.split('.')[-1]=='pdf':
+                            fullFile = (dirs + r'/' + file.split('.')[0])
+                            filesImported.append(fullFile)
+                    else:
+                        pass
+        if filesImported:
+            [print(i) for i in filesImported]
+            return filesImported
+            # Move to imported subdirectory
+            #return True
+        else:
+            print('No files present to import')
+            return False
+    except:
+        print('Directory parsing error: %s' % e)
+        raise
+
+
+buildSheetImportIterator('/Users/jayphinizy/PycharmProjects/autopdf')
+
+#fileProcess('bs2')
 
 
 
