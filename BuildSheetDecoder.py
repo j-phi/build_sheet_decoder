@@ -1,27 +1,32 @@
 from bs4 import BeautifulSoup
-
+from pdf2htmlEX import buildSheetImportIterator, pdfToHTML
 '''
 Prior to use, ensure that you have used pdf2htmlEX.py to convert pdf files
 to parse-able html files.
 '''
+pdfDirectory = '/Users/jayphinizy/PycharmProjects/autopdf/TestProcessor'
+processFiles = buildSheetImportIterator(pdfDirectory) # Add pdfs from root dir to list
+divList = []
+[pdfToHTML(i) for i in processFiles] # Converts pdfs to html, cleans it, moves everything but htmls to imported folder
+processFiles = [] # Clear processFiles
+processFiles = buildSheetImportIterator(pdfDirectory) # Gets new list of html files from list
 
-html_doc = 'bs2.html'
-html = open(html_doc,'r').read()
-soup = BeautifulSoup(html, 'html.parser')
 
-# Remove extraneous img, style, and script tags and their contents
-#
-# http://stackoverflow.com/questions/5598524/can-i-remove-script-tags-with-beautifulsoup
-#
-# Unsure if this could be replaced by a soupstrainer to just allow and parse divs?
+def initialClean(soup):
 
-[s.decompose() for s in soup('img')]
-[s.decompose() for s in soup('style')]
-[s.decompose() for s in soup('script')]
-[s.decompose() for s in soup(class_= '_ _6')] # Remove hidden spans in vehicle info
-[s.decompose() for s in soup(class_= '_ _7')] # Remove hidden spans in vehicle info
+    # Remove extraneous img, style, and script tags and their contents
+    #
+    # http://stackoverflow.com/questions/5598524/can-i-remove-script-tags-with-beautifulsoup
+    #
+    # Unsure if this could be replaced by a soupstrainer to just allow and parse divs?
 
-divList = [s.text for s in soup.find_all('div')]
+    [s.decompose() for s in soup('img')]
+    [s.decompose() for s in soup('style')]
+    [s.decompose() for s in soup('script')]
+    [s.decompose() for s in soup(class_= '_ _6')] # Remove hidden spans in vehicle info
+    [s.decompose() for s in soup(class_= '_ _7')] # Remove hidden spans in vehicle info
+    divList = []
+    divList = [s.text for s in soup.find_all('div')]
 
 
 def find(lst, searchTerm, offset):
@@ -89,7 +94,6 @@ def mfgInstalledList():
     The html looks like this: <div>FeatureName<span>-inst</span></div>
     :return: list of items with '-inst' designation, meaning the manufacturer indicates the equipment is installed.
     """
-
     spanList = [s.text for s in soup.find_all('span')]
     spanParents = [s.parent.text for s in soup.find_all('span')]
     instList = find(spanList, '- inst',0)
@@ -108,6 +112,7 @@ def OEMInstalledList():
             Remove first and second item from every list ('Installed', '$')
     :return: list of items from OEM list, including MSRP, OEM CODE, and DESCRIPTION
     """
+    divList = [s.text for s in soup.find_all('div')]
     msrpList = find(divList, 'Installed',0)
     availEquip = []
 
@@ -127,14 +132,6 @@ def OEMInstalledList():
             availEquip.append(curEquip)
     return availEquip
 
-
-
-'''
-Search for div contents "." and then the contents that are in all caps in the following div. This should isolate the
-section headers. Determine the first and next div count for those sections and return everything between to go into
-that section. Use ALL CAPS vs lowercase to determine what overflows together. Be sure to filter "copyright" and "page"
-
-'''
 def stdEquip():
     """
     This locates the position of the div with the contents 'Standard Equipment' and then saves the numeric index
@@ -144,6 +141,7 @@ def stdEquip():
     I can find no way to tell whether a given line is the start of a new entry or continuation of the previous entry.
     :return: List of standard equipment
     """
+    divList = [s.text for s in soup.find_all('div')]
     #stdEquip locates the start of the Standard Equipment Section
     stdEquip = find(divList, 'Standard Equipment',0)
     #upperList finds divs whose contents are all uppercase and then filters that list to only items after stdEquip
@@ -166,24 +164,27 @@ def stdEquip():
             standardEquipment.append(curEquip)
     return standardEquipment
 
+for p in processFiles:
+    print('\n')
+    html_doc = p+'.html'
+    html = open(html_doc,'r').read()
+    soup = BeautifulSoup(html, 'html.parser')
+    initialClean(soup)
 
-autoStats = buildStatDict()
-for k, v in autoStats.items():
-    print(k + ': ' + v)
+    autoStats = buildStatDict()
+    for k, v in autoStats.items():
+        print(k + ': ' + v)
 
+    checkedSelected = submissionChecklist()
+    print(checkedSelected)
 
-checkedSelected = submissionChecklist()
-print(checkedSelected)
+    mfgInstalled = mfgInstalledList()
+    print(mfgInstalled)
 
-mfgInstalled = mfgInstalledList()
-print(mfgInstalled)
+    oemInstalled = OEMInstalledList()
+    print(oemInstalled)
 
-oemInstalled = OEMInstalledList()
-print(oemInstalled)
-
-stdEquipment = stdEquip()
-print(stdEquipment)
-
+    stdEquipment = stdEquip()
+    print(stdEquipment)
 
 #print(soup.prettify())
-#print(soup)

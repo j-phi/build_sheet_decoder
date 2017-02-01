@@ -23,7 +23,7 @@ import fileinput
 import os
 
 
-def fileProcess(fileName):
+def pdfToHTML(fileName):
     """
     Takes in fileName, converts it to HTML with pdf2htmlEX, and fixes a conversion
     error specific to the build sheets
@@ -31,22 +31,24 @@ def fileProcess(fileName):
     :return:
     """
     pdfName = fileName+'.pdf'
+    folder, tail = os.path.split(pdfName) # get folder where pdfs are stored
+    pdfConvert(pdfName, folder) # convert all pdfs in folder to html
     htmlName = fileName+'.html'
-    pdfConvert(pdfName)
-    htmlFixer(htmlName)
+    htmlFixer(htmlName) # make adjustments to html file to improve parsing
 
 
-def pdfConvert(pdfName):
+def pdfConvert(pdfName, directory):
     """
     Take an input pdf and convert it to HTML.
     :param pdfName:
     :return:
     """
     try:
-        subprocess.call("pdf2htmlEX "+pdfName, shell=True)
+        subprocess.call("pdf2htmlEX "+pdfName+' --dest-dir '+directory, shell=True)
     except:
-        print('pdf2htmlEX did not work, is it installed and in your path? Error: %s' % e)
+        print('pdf2htmlEX did not work, is it installed and in your path?')
         raise
+    createImported(pdfName)
 
 
 
@@ -69,8 +71,11 @@ def htmlFixer(htmlName):
             for line in file:
                 print(line.replace(textToSearch, textToReplace), end='')
     except:
-        print('HTML editing error: %s' % e)
+        print('HTML editing error.')
         raise
+    createImported(htmlName+'.bak')
+
+
 
 def buildSheetImportIterator(rootDir):
     """
@@ -79,7 +84,7 @@ def buildSheetImportIterator(rootDir):
     and builds a list of these files called filesImported.
 
     :param rootDir: Root directory
-    :return: true if files present for import
+    :return: list of files
     """
     filesImported = []
 
@@ -88,27 +93,41 @@ def buildSheetImportIterator(rootDir):
             if not dirs.split("/")[-1] == 'imported':  # avoid directories called imported
                 for file in files:
                     if not file[:1] == '.':  # avoid hidden files that start with a period
-                        if file.split('.')[-1]=='pdf':
+                        if file.split('.')[-1]=='pdf' or file.split('.')[-1]=='html':
                             fullFile = (dirs + r'/' + file.split('.')[0])
                             filesImported.append(fullFile)
                     else:
                         pass
         if filesImported:
-            [print(i) for i in filesImported]
+            #[print(i) for i in filesImported]
             return filesImported
-            # Move to imported subdirectory
-            #return True
         else:
             print('No files present to import')
             return False
     except:
-        print('Directory parsing error: %s' % e)
+        print('Directory parsing error.')
         raise
 
 
-buildSheetImportIterator('/Users/jayphinizy/PycharmProjects/autopdf')
+def createImported(fileName):
+    """
+    Take in fileName (includes directory and name), split into directory and file, create
+    subdirectory under directory called "imported", and move file into that subdirectory
+    :param fileName: Full file name, including directory (i.e. /Usr/Me/Desktop/file.xls
+    :return: True if completed
+    """
+    directory, file = os.path.split(fileName)
 
-#fileProcess('bs2')
+    importedDir = directory + '/imported'
+    os.makedirs(importedDir, exist_ok=True)
+    finalFile = importedDir + '/' + file
+    if os.rename(fileName, finalFile):
+        return True
+    else:
+        return False
+
+
+
 
 
 
