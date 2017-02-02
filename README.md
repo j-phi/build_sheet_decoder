@@ -7,6 +7,7 @@ Utilizes pdf2htmlEX to convert .pdf to .html, then parses html using beautifulso
 - [ ] Build additional error checking
 - [ ] Use regex to verify divs based on contents in addition to class designations assigned by pdf2htmlEX
 - [ ] Add output module to create .csv or add directly to database
+- [ ] Remove first and second column output of OEM data
 - [ ] For standard equipment (final) section, determine if it's critical that same-section lines should be grouped together; if so, consider parsing css to build list of classes corresponding to the various background colors and use that to determine whether to append to the current list or start a new sublist.
 
 
