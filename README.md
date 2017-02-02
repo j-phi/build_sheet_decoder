@@ -8,7 +8,7 @@ Utilizes pdf2htmlEX to convert .pdf to .html, then parses html using beautifulso
 - [ ] Use regex to verify divs based on contents in addition to class designations assigned by pdf2htmlEX
 - [ ] Add output module to create .csv or add directly to database
 - [X] Remove first and second column output of OEM data
-- [ ] For standard equipment (final) section, determine if it's critical that same-section lines should be grouped together. If so, consider rule to group with previous line if previous line div width >480px & current line begins with lowercase or a parenthesis was opened previously and not yet closed. This will likely not be perfect, but would work for our two sample documents. Unfortunately, there is no css style that dictates the color of the row background; it's a full-page image file.
+- [ ] For standard equipment (final) section, determine if it's critical that same-section lines should be grouped together. If so, consider rule to group with previous line if previous line div width >480px & current line begins with lowercase or a parenthesis was opened previously and not yet closed. This will likely not be perfect, but would work for our two sample documents. Unfortunately, there is no css style that dictates the color of the row background; it's a full-page image file. Alternatively, use [scipy.misc.imread](https://docs.scipy.org/doc/scipy/reference/generated/scipy.misc.imread.html) to build list of cartesian points where colors change in a vertical column on the image in the background of the page and compare to stylesheet {bottom} position of the divs to determine if they are in the same "table row".
 
 ---
 ####buildStatDict()
