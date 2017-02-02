@@ -77,7 +77,7 @@ def htmlFixer(htmlName):
 
 
 
-def buildSheetImportIterator(rootDir):
+def buildSheetImportIterator(rootDir, extension):
     """
     This function iterates through the subdirectories in rootDir,
     filters by files with a .pdf extension that aren't hidden,
@@ -93,7 +93,7 @@ def buildSheetImportIterator(rootDir):
             if not dirs.split("/")[-1] == 'imported':  # avoid directories called imported
                 for file in files:
                     if not file[:1] == '.':  # avoid hidden files that start with a period
-                        if file.split('.')[-1]=='pdf' or file.split('.')[-1]=='html':
+                        if file.split('.')[-1]==extension:
                             fullFile = (dirs + r'/' + file.split('.')[0])
                             filesImported.append(fullFile)
                     else:

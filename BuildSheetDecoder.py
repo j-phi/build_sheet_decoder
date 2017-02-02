@@ -4,12 +4,12 @@ from pdf2htmlEX import buildSheetImportIterator, pdfToHTML
 Prior to use, ensure that you have used pdf2htmlEX.py to convert pdf files
 to parse-able html files.
 '''
-pdfDirectory = '/Users/jayphinizy/PycharmProjects/autopdf/TestProcessor'
-processFiles = buildSheetImportIterator(pdfDirectory) # Add pdfs from root dir to list
+pdfDirectory = '/Users/jayphinizy/Desktop/TestProcessor'
+processFiles = buildSheetImportIterator(pdfDirectory, 'pdf') # Add pdfs from root dir to list
 divList = []
 [pdfToHTML(i) for i in processFiles] # Converts pdfs to html, cleans it, moves everything but htmls to imported folder
 processFiles = [] # Clear processFiles
-processFiles = buildSheetImportIterator(pdfDirectory) # Gets new list of html files from list
+processFiles = buildSheetImportIterator(pdfDirectory, 'html') # Gets new list of html files from list
 
 
 def initialClean(soup):
@@ -126,8 +126,8 @@ def OEMInstalledList():
             # Return everything between the current 'Installed' position (start) and the next 'Installed' position (end)
             for x in range(start, end):
                 if(divList[x]):
-                    # Skip if first word is 'Copyright' or 'Page'
-                    if(divList[x].split(' ')[0] not in ['Copyright', 'Page']):
+                    # Skip if first word is 'Copyright', 'Page', 'Installed', or '$'
+                    if(divList[x].split(' ')[0] not in ['Copyright', 'Page', 'Installed', '$']):
                         curEquip.append(divList[x])
             availEquip.append(curEquip)
     return availEquip
