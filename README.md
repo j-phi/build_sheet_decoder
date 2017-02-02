@@ -25,7 +25,6 @@ Utilizes pdf2htmlEX to convert .pdf to .html, then parses html using beautifulso
 ---
 ####stdEquip()
 ![alt tag](https://cloud.githubusercontent.com/assets/23618756/22548115/fa626b80-e912-11e6-883c-9928a507ee3f.png)
-
-
-
+---
+####Test run
 ![alt tag](https://cloud.githubusercontent.com/assets/23618756/22530352/215a44d4-e8a9-11e6-8e8a-dee3e55904d4.gif)
