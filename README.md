@@ -1,5 +1,5 @@
 # Build Sheet Decoder
-Build sheet decoder for CCC vehicle build sheets in pdf format.
+Build sheet scraper for CCC vehicle build sheets in pdf format.
 
 Utilizes pdf2htmlEX to convert .pdf to .html, then parses html using beautifulsoup. See BuildSheetDecoder.py.
 
