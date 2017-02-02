@@ -96,10 +96,10 @@ def mfgInstalledList():
     """
     spanList = [s.text for s in soup.find_all('span')]
     spanParents = [s.parent.text for s in soup.find_all('span')]
-    instList = find(spanList, '- inst', -1) # Start with span before '-inst'
+    instList = find(spanList, '- inst', 0)
     fnlInstLst = []
     print('\nInstalled Items (MFG):')
-    for l in instList[1:]: #([1:] because first inst is in Legend)
+    for l in instList[0:]:
         fnlInstLst.append(spanParents[l].split(' -')[0])
     return(fnlInstLst)
 
